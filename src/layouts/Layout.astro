@@ -1,3 +1,13 @@
+---
+import Navbar from "@/components/shared/navbar.astro";
+
+interface Layout {
+	title?: string;
+}
+
+const { title = "Astro Basics" }: Layout = Astro.props;
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
@@ -5,10 +15,13 @@
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<title>{title}</title>
 	</head>
 	<body>
-		<slot />
+		<Navbar />
+		<main class="container max-w-5xl mx-5">
+			<slot />
+		</main>
 	</body>
 </html>
 
