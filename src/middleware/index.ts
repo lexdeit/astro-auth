@@ -10,9 +10,26 @@ const privateRoutes = [
     "/protected",
 ];
 
+const publicRoutes = [
+    "/login",
+    "/register"
+];
+
 export const onRequest = defineMiddleware(async (context, next) => {
 
     const { url, request } = context;
+
+
+
+    if (publicRoutes.includes(url.pathname)) {
+
+        const isUserAuth = await isUserAuthenticated({ request, auth });
+
+        if (isUserAuth.isAuthed) {
+            return context.redirect("/protected");
+        }
+
+    }
 
     if (privateRoutes.includes(url.pathname)) {
 
@@ -47,7 +64,7 @@ const isUserAuthenticated = async (
     }
 
     const isAuthed = await auth.api.getSession({ headers: request.headers });
-    console.log("isAuthed", isAuthed)
+
     if (!isAuthed) {
         return {
             isAuthed: false,
