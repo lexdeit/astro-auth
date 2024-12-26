@@ -1,5 +1,7 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
+import { auth } from "@/lib/auth";
+
 
 export const registerUser = defineAction({
     accept: "form",
@@ -14,21 +16,36 @@ export const registerUser = defineAction({
 
         const { name, email, password, remember_me } = input;
 
-        console.log(name, email, password, remember_me);
+        const { cookies } = ctx;
 
         if (remember_me) {
-            ctx.cookies.set('email', email, {
+            cookies.set('email', email, {
                 httpOnly: true,
                 maxAge: 60 * 60 * 24 * 365,
                 path: '/',
             });
         } else {
-            ctx.cookies.delete('email', {
+            cookies.delete('email', {
                 path: "/"
             });
         }
 
 
+        const { token } = await auth.api.signUpEmail({
+            body: {
+                name: name,
+                email: email,
+                password: password,
+            }
+        });
+
+
+        if (!token) {
+            return {
+                ok: false,
+                message: "User could not be registered",
+            }
+        }
 
         return {
             ok: true,

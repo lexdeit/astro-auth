@@ -16,7 +16,6 @@ export const onRequest = defineMiddleware(async ({ url, request }, next) => {
 
 
     if (privateRoutes.includes(url.pathname)) {
-
         return checkLocalAuth(authHeaders, next);
     } else {
 

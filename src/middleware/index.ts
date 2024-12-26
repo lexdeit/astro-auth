@@ -1,6 +1,8 @@
 // src/middleware/index.ts
 import type { MiddlewareNext } from "astro";
 import { defineMiddleware } from "astro:middleware";
+import { auth } from "@/lib/auth";
+import type { Auth } from "@/lib/auth";
 
 
 const privateRoutes = [
@@ -9,48 +11,52 @@ const privateRoutes = [
     "/protected",
 ];
 
-export const onRequest = defineMiddleware(async ({ url, request }, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
 
-
-    const authHeaders = request.headers.get('authorization') ?? "";
-
+    console.log("Me ejecute en el nuevo")
+    const { url, request } = context;
 
     if (privateRoutes.includes(url.pathname)) {
 
-        return checkLocalAuth(authHeaders, next);
+        return await isUserAuthenticated({ request, auth, next });
+        return next();
+
     } else {
-
-
-
         return next();
     }
 });
 
+const isUserAuthenticated = async (
+    {
+        request,
+        auth,
+        next
+    }: {
+        request: Request;
+        auth: Auth;
+        next: MiddlewareNext;
+    }) => {
 
-const checkLocalAuth = async (authHeaders: string, next: MiddlewareNext) => {
-
-
-    if (!authHeaders) {
+    if (!request.headers) {
         return new Response("Unauthorized", {
             status: 401,
             headers: {
                 'WWW-Authenticate': 'Basic realm="Secure Area"'
             }
-        })
+        });
     }
 
-    const [username, password] = atob(authHeaders.split(' ')[1]).split(':');
-    console.log(username, password);
-
-    if (username === 'admin' && password === 'admin1') {
+    const isAuthed = await auth.api.getSession({ headers: request.headers });
+    console.log(isAuthed);
+    if (!isAuthed) {
+        return new Response("Unauthorized", {
+            status: 401,
+            headers: {
+                'WWW-Authenticate': 'Basic realm="Secure Area"'
+            }
+        });
+    } else {
         return next();
     }
-
-    return new Response("Unauthorized", {
-        status: 401,
-        headers: {
-            'WWW-Authenticate': 'Basic realm="Secure Area"'
-        }
-    });
 
 };
