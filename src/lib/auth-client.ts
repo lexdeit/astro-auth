@@ -7,7 +7,6 @@ import { createAuthClient } from "better-auth/client";
 
 const BETTER_AUTH_URL = "http://localhost:4321";
 
-export const { signIn, signUp, useSession } = createAuthClient({
+export const { signIn, signUp, useSession, getSession, signOut } = createAuthClient({
     baseURL: BETTER_AUTH_URL, // the base url of your auth server
-
-})
+});
