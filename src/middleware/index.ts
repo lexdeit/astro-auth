@@ -13,13 +13,18 @@ const privateRoutes = [
 
 export const onRequest = defineMiddleware(async (context, next) => {
 
-    console.log("Me ejecute en el nuevo")
     const { url, request } = context;
 
     if (privateRoutes.includes(url.pathname)) {
 
-        return await isUserAuthenticated({ request, auth, next });
-        return next();
+        const isUserAuth = await isUserAuthenticated({ request, auth });
+
+        if (isUserAuth.isAuthed) {
+            return next();
+        }
+        else {
+            return context.redirect("/login");
+        }
 
     } else {
         return next();
@@ -30,33 +35,30 @@ const isUserAuthenticated = async (
     {
         request,
         auth,
-        next
     }: {
         request: Request;
         auth: Auth;
-        next: MiddlewareNext;
     }) => {
 
     if (!request.headers) {
-        return new Response("Unauthorized", {
-            status: 401,
-            headers: {
-                'WWW-Authenticate': 'Basic realm="Secure Area"'
-            }
-        });
+        return {
+            isAuthed: false,
+            message: "No headers found"
+        }
     }
 
     const isAuthed = await auth.api.getSession({ headers: request.headers });
-    console.log(isAuthed);
+
     if (!isAuthed) {
-        return new Response("Unauthorized", {
-            status: 401,
-            headers: {
-                'WWW-Authenticate': 'Basic realm="Secure Area"'
-            }
-        });
+        return {
+            isAuthed: false,
+            message: "User is not authenticated"
+        }
     } else {
-        return next();
+        return {
+            isAuthed: true,
+            message: "User is authenticated"
+        }
     }
 
 };
