@@ -18,7 +18,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     const { url, request, locals } = context;
     const { user, session } = await auth.api.getSession({ headers: request.headers }) || {};
-    if (user && session) Object.assign(locals, { user, session });
+    if (user && session) Object.assign(locals, { user, session, isLoggedIn: true });
 
     if (publicRoutes.includes(url.pathname)) {
         return user ? context.redirect("/protected") : next();
