@@ -1,10 +1,7 @@
-import 'dotenv/config';
-import { drizzle } from 'drizzle-orm/libsql';
+// ESTE ARCHIVO FUE GENERADO DINAMICAMENTE AL EJECUTAR EL COMANDO `npx @better-auth/cli generate`
+// ESTO NO SE VA A INSERTAR EN LA BASE DE DATOS ES NECESARIO DEFINIR LAS TABLAS EN EL ARCHIVO `src/db/schema.ts`
+
 import { sqliteTable, text, integer, } from "drizzle-orm/sqlite-core";
-
-
-export const db = drizzle(process.env.DB_FILE_NAME!);
-
 
 export const user = sqliteTable("user", {
 	id: text("id").primaryKey(),
