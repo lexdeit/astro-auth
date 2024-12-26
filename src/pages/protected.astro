@@ -16,6 +16,7 @@ const { user }: { user: User } = sessionData;
 const userName = user.name;
 const email = user.email;
 const userAvatar = user.image;
+const isEmailVerified = user.emailVerified;
 ---
 
 <Layout>
@@ -31,7 +32,7 @@ const userAvatar = user.image;
             </picture>
             <div class="text-center mt-2 text-3xl font-medium">{userName}</div>
             <div class="text-center mt-2 font-light text-sm">{email}</div>
-            <div class="text-center font-normal text-lg">Kerala</div>
+            <div class="text-center font-normal text-lg text-green-500">{isEmailVerified ? "Email verified" : "Pending verification"}</div>
             <div class="px-6 text-center mt-2 font-light text-sm">
                 <p>
                     Front end Developer, avid reader. Love to take a long walk,
