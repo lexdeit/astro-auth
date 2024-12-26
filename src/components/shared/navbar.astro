@@ -40,6 +40,9 @@
             <li class="font-semibold text-gray-700">
                 <a href="/register">Register</a>
             </li>
+            <li id="logoutButton" class="font-semibold text-gray-700">
+                <a href="#">Log out</a>
+            </li>
             <li>
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -95,3 +98,22 @@
         </ul>
     </div>
 </nav>
+
+<script>
+    import { signOut } from "@/lib/auth-client";
+
+    const logoutButton = document.querySelector(
+        "#logoutButton",
+    ) as HTMLLIElement;
+
+
+    logoutButton?.addEventListener("click", async () => {
+
+         signOut();
+
+         window.location.replace("/");
+
+    });
+
+
+</script>
