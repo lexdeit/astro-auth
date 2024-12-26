@@ -140,7 +140,8 @@ const remember_me = !!email;
 </AuthLayout>
 
 <script>
-    import { actions } from "astro:actions";
+    import { signUp } from "@/lib/auth-client";
+    import Swal from "sweetalert2";
 
     const form = document.querySelector("form") as HTMLFormElement;
 
@@ -155,14 +156,30 @@ const remember_me = !!email;
 
         const formData = new FormData(form);
 
-        const { data, error } = await actions.registerUser(formData);
+        const email = formData.get("email")?.toString() || "";
+        const name = formData.get("name")?.toString() ?? "";
+        const password = formData.get("password")?.toString() ?? "";
+
+        const { data, error } = await signUp.email({
+            email: email,
+            name: name,
+            password: password,
+            fetchOptions: {
+                onSuccess(ctx) {},
+            },
+        });
 
         if (error) {
             console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: error.message,
+            });
             submitButton.removeAttribute("disabled");
             return;
         }
 
-        submitButton.removeAttribute("disabled");
+        window.location.replace("/protected");
     });
 </script>

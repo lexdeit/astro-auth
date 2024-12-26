@@ -10,6 +10,11 @@ export const auth = betterAuth({
     }),
     emailAndPassword: {
         enabled: true,
+        autoSignIn: true,
+    },
+    session: {
+        expiresIn: 60 * 60 * 24 * 7, // 7 días
+        updateAge: 60 * 60 * 24      // 1 día (la expiración se actualiza cada día)
     }
 });
 

@@ -1,5 +1,4 @@
 // src/middleware/index.ts
-import type { MiddlewareNext } from "astro";
 import { defineMiddleware } from "astro:middleware";
 import { auth } from "@/lib/auth";
 import type { Auth } from "@/lib/auth";
@@ -48,7 +47,7 @@ const isUserAuthenticated = async (
     }
 
     const isAuthed = await auth.api.getSession({ headers: request.headers });
-
+    console.log("isAuthed", isAuthed)
     if (!isAuthed) {
         return {
             isAuthed: false,

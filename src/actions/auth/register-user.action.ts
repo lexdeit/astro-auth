@@ -1,6 +1,7 @@
 import { defineAction } from 'astro:actions';
 import { z } from 'astro:schema';
 import { auth } from "@/lib/auth";
+import type { BetterAuthError } from 'better-auth';
 
 
 export const registerUser = defineAction({
@@ -16,6 +17,7 @@ export const registerUser = defineAction({
 
         const { name, email, password, remember_me } = input;
 
+        // Cookies
         const { cookies } = ctx;
 
         if (remember_me) {
@@ -30,22 +32,42 @@ export const registerUser = defineAction({
             });
         }
 
+        try {
 
-        const { token } = await auth.api.signUpEmail({
-            body: {
-                name: name,
-                email: email,
-                password: password,
+            // Register user
+            const { token } = await auth.api.signUpEmail({
+                body: {
+                    name: name,
+                    email: email,
+                    password: password,
+                }
+            });
+
+
+            if (!token) {
+                return {
+                    ok: false,
+                    message: "User could not be registered",
+                }
             }
-        });
 
+            // Establecer la cookie con el token de sesión
+            cookies.set('better-auth.session_token', token, {
+                httpOnly: true, // No accesible desde JavaScript en el cliente
+                secure: false,   // Solo se envía a través de conexiones HTTPS
+                maxAge: 60 * 60 * 24 * 7, // Expira en 7 días
+                path: '/',
+            });
 
-        if (!token) {
-            return {
-                ok: false,
-                message: "User could not be registered",
-            }
+        } catch (error) {
+
+            const betterAuthError = error as BetterAuthError;
+
+            const message = betterAuthError.message;
+
+            throw new Error(message);
         }
+
 
         return {
             ok: true,

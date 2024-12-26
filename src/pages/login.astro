@@ -42,13 +42,14 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
                             Please sign in to your account.
                         </p>
                     </div>
-                    <div class="space-y-5">
+                    <form class="space-y-5">
                         <div class="space-y-2">
                             <label
                                 class="text-sm font-medium text-gray-700 tracking-wide"
                                 >Email</label
                             >
                             <input
+                                name="email"
                                 class="w-full text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-400"
                                 type="email"
                                 placeholder="mail@gmail.com"
@@ -61,6 +62,7 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
                                 Password
                             </label>
                             <input
+                                name="password"
                                 class="w-full content-center text-base px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-green-400"
                                 type="password"
                                 placeholder="Enter your password"
@@ -92,13 +94,14 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
                         </div>
                         <div>
                             <button
+                                id="submitButton"
                                 type="submit"
                                 class="w-full flex justify-center bg-green-400 hover:bg-green-500 text-gray-100 p-3 rounded-full tracking-wide font-semibold shadow-lg cursor-pointer transition ease-in duration-500"
                             >
                                 Sign in
                             </button>
                         </div>
-                    </div>
+                    </form>
                     <div class="pt-5 text-center text-gray-400 text-xs">
                         <span>
                             Copyright © 2021-2022
@@ -116,3 +119,46 @@ import AuthLayout from "@/layouts/AuthLayout.astro";
         </div>
     </div>
 </AuthLayout>
+
+<script>
+    import { signIn } from "@/lib/auth-client";
+    import Swal from "sweetalert2";
+
+    const form = document.querySelector("form") as HTMLFormElement;
+
+    const submitButton = document.getElementById(
+        "submitButton",
+    ) as HTMLButtonElement;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        submitButton.setAttribute("disabled", "true");
+
+        const formData = new FormData(form);
+
+        const email = formData.get("email")?.toString() || "";
+        const password = formData.get("password")?.toString() ?? "";
+
+        const { data, error } = await signIn.email({
+            email: email,
+            password: password,
+            fetchOptions: {
+                onSuccess(ctx) {},
+            },
+        });
+
+        if (error) {
+            console.error(error);
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: error.message,
+            });
+            submitButton.removeAttribute("disabled");
+            return;
+        }
+
+        window.location.replace("/protected");
+    });
+</script>
